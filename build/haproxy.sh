@@ -2,9 +2,7 @@
 
 set -eo pipefail
 
-ETCD_PORT=${ETCD_PORT:-4001}
-HOST_IP=${HOST_IP:-172.17.42.1}
-ETCD=$HOST_IP:$ETCD_PORT
+ETCD=$ETCDCTL_ENDPOINT
 CONFD=/usr/local/bin/confd
 TOML=/etc/confd/conf.d/haproxy.toml
 
@@ -18,7 +16,7 @@ done
 
 # Put a continual polling `confd` process into the background to watch
 # for changes every 10 seconds
-${CONFD} -interval 10 -node ${ETCD} -config-file ${TOML} &
+${CONFD} -watch -node ${ETCD} -config-file ${TOML} &
 echo "[haproxy] confd is now monitoring etcd for changes..."
 
 # Start the Haproxy service using the generated config
